@@ -22,6 +22,10 @@
 
 `sts:GetCallerIdentity` needs no permission. If you pass `--cur-bucket/--cur-prefix`, `--activity-bucket` and `--identity-store-id`, the `Discover` statement is not needed.
 
+### Using the AWS-managed `ReadOnlyAccess` role
+
+Verified against a real IAM Identity Center permission set: `ReadOnlyAccess` does **not** include `bcm-data-exports:ListExports`. `kiro-report` handles it: when that call is denied it falls back to scanning the buckets whose name hints at billing data (`cur`, `cost`, `billing`, `report`) for `.../data/BILLING_PERIOD=YYYY-MM/*.parquet`, which only needs S3 read access. If your CUR bucket has an unrelated name, pass `--cur-bucket` and `--cur-prefix`.
+
 Run it from the **payer / management account** that receives the Kiro charges, or from the account that owns the activity-report bucket (Kiro activity reports and CUR can live in different accounts: run once per account and combine with `--no-cur` / `--no-activity`).
 
 ## Enabling the Kiro user activity report

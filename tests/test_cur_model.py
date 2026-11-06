@@ -2,6 +2,7 @@ import datetime as dt
 import json
 
 import pytest
+from botocore.exceptions import ClientError
 
 from kiro_report import cur, demo, model
 from kiro_report.activity import ActivityRow
@@ -131,3 +132,68 @@ def test_demo_is_deterministic_and_complete():
     assert first == second
     assert first["meta"]["demo"] and len(first["people"]) == 12 and first["activity"]["rows"]
     assert set(first["activity"]["clients"]) == {"CLI", "IDE", "WEB"}
+
+
+CUR_KEY = "cost/ticnow-report-cost/data/BILLING_PERIOD=2026-10/x-00001.snappy.parquet"
+
+
+class FakeBuckets:
+    """S3 stand-in for the CUR bucket scan: bucket name -> list of keys."""
+
+    def __init__(self, buckets):
+        self.buckets = buckets
+
+    def list_buckets(self):
+        return {"Buckets": [{"Name": n} for n in self.buckets]}
+
+    def get_paginator(self, _name):
+        return self
+
+    def paginate(self, Bucket):
+        return [{"Contents": [{"Key": k} for k in self.buckets[Bucket]]}]
+
+
+class DeniedBcm:
+    def __init__(self, code):
+        self.code = code
+
+    def list_exports(self):
+        raise ClientError({"Error": {"Code": self.code, "Message": "no"}}, "ListExports")
+
+
+class SessionWith:
+    def __init__(self, bcm, s3):
+        self.bcm, self.s3 = bcm, s3
+
+    def client(self, name, region_name=None):
+        return self.bcm if name == "bcm-data-exports" else self.s3
+
+
+@pytest.mark.unit
+def test_discover_by_scan_finds_the_cur_and_ignores_unrelated_keys_and_buckets():
+    s3 = FakeBuckets({
+        "photos": [CUR_KEY],  # name gives no billing hint: never scanned
+        "my-cost-bucket": ["cost/other.txt", "cost/ticnow-report-cost/metadata/BILLING_PERIOD=2026-10/m.json", CUR_KEY],
+    })
+    assert cur.discover_by_scan(s3) == cur.CurSource("my-cost-bucket", "cost/ticnow-report-cost/data", "ticnow-report-cost")
+
+
+@pytest.mark.unit
+def test_discover_by_scan_returns_none_when_nothing_or_scan_cap_reached():
+    assert cur.discover_by_scan(FakeBuckets({"cost-x": ["a", "b", CUR_KEY]}), max_scan=2) is None
+    assert cur.discover_by_scan(FakeBuckets({})) is None
+
+
+@pytest.mark.unit
+def test_discover_falls_back_to_scan_only_when_the_api_is_denied():
+    s3 = FakeBuckets({"cost-bucket": [CUR_KEY]})
+    found = cur.discover(SessionWith(DeniedBcm("AccessDeniedException"), s3))
+    assert found == cur.CurSource("cost-bucket", "cost/ticnow-report-cost/data", "ticnow-report-cost")
+    with pytest.raises(ClientError):
+        cur.discover(SessionWith(DeniedBcm("ThrottlingException"), s3))
+
+
+@pytest.mark.unit
+def test_discover_prefers_the_data_export_when_available():
+    session = FakeSession(FakeBcm("cost"))
+    assert cur.discover(session) == cur.CurSource("b", "cost/exp/data", "exp")
