@@ -17,7 +17,8 @@ The output is a static `.html` file (light/dark theme, English/Spanish, date-ran
 ## Quick start
 
 ```bash
-pip install git+https://github.com/syscu-es/syscu-kiro-report-usage.git
+pip install syscu-kiro-report-usage            # from PyPI
+pip install git+https://github.com/syscu-es/syscu-kiro-report-usage.git   # latest from GitHub
 # or from a clone:  pip install .     (development: pip install -e ".[dev]")
 
 kiro-report --demo --open        # preview with synthetic data, no AWS needed
@@ -99,6 +100,10 @@ ruff check .
 ```
 
 Plan prices/allowances live in `src/kiro_report/tiers.py` (Kiro pricing is subject to change).
+
+## Releasing
+
+Releases are published to PyPI by GitHub Actions with [Trusted Publishing](https://docs.pypi.org/trusted-publishers/) (OIDC, no stored tokens): `.github/workflows/release.yml`. To release, bump `version` in `pyproject.toml`, merge, then push a tag `vX.Y.Z` (the workflow refuses a tag that does not match the version). Run the workflow manually with target `testpypi` to rehearse.
 
 ## License
 
