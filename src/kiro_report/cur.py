@@ -7,10 +7,13 @@ cost and credit usage.
 from __future__ import annotations
 
 import collections
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 from collections.abc import Iterable, Iterator
+
+from botocore.exceptions import ClientError
 
 from .ids import normalize_user_id
 
@@ -110,6 +113,49 @@ def discover_export(session: Any, name: str | None = None) -> CurSource | None:
         base = f"{prefix}/{item['ExportName']}/data" if prefix else f"{item['ExportName']}/data"
         return CurSource(dest["S3Bucket"], base, item["ExportName"])
     return None
+
+
+_DATA_KEY_RE = re.compile(r"^(?P<base>.+/data)/BILLING_PERIOD=\d{4}-\d{2}/[^/]+\.parquet$")
+_BUCKET_HINT_RE = re.compile(r"cur|cost|billing|report", re.IGNORECASE)
+_DENIED_CODES = {"AccessDenied", "AccessDeniedException", "UnauthorizedOperation"}
+DEFAULT_MAX_SCAN = 5000
+
+
+def discover_by_scan(s3: Any, max_scan: int = DEFAULT_MAX_SCAN) -> CurSource | None:
+    """Find a CUR by looking for ``.../data/BILLING_PERIOD=YYYY-MM/*.parquet`` keys.
+
+    Needs only S3 read access, so it works with roles (e.g. the AWS-managed ReadOnlyAccess)
+    that cannot call ``bcm-data-exports:ListExports``. Only buckets whose name hints at
+    billing data (cur, cost, billing, report) are scanned.
+    """
+    for bucket in sorted(b["Name"] for b in s3.list_buckets().get("Buckets", [])):
+        if not _BUCKET_HINT_RE.search(bucket):
+            continue
+        scanned = 0
+        for page in s3.get_paginator("list_objects_v2").paginate(Bucket=bucket):
+            for obj in page.get("Contents", []):
+                match = _DATA_KEY_RE.match(obj["Key"])
+                if match:
+                    base = match["base"]
+                    return CurSource(bucket, base, base.rsplit("/", 2)[-2] if base.count("/") else bucket)
+                scanned += 1
+                if scanned >= max_scan:
+                    break
+            if scanned >= max_scan:
+                break
+    return None
+
+
+def discover(session: Any, name: str | None = None) -> CurSource | None:
+    """Data Export lookup, falling back to a bucket scan when the API call is denied."""
+    try:
+        found = discover_export(session, name)
+        if found:
+            return found
+    except ClientError as exc:
+        if exc.response.get("Error", {}).get("Code") not in _DENIED_CODES:
+            raise
+    return discover_by_scan(session.client("s3"))
 
 
 def list_month_files(s3: Any, source: CurSource, month: str) -> list[dict[str, Any]]:

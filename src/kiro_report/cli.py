@@ -154,7 +154,8 @@ def _select(items: list[Any], wanted: str | None, ask: bool, input_fn: Callable[
     if len(items) == 1:
         return items[0]
     if not ask:
-        raise aws.AuthError(f"several options for {title.lower()}; pass {flag}")
+        raise aws.AuthError(f"several options for {title.lower()}; pass {flag}. Available: "
+                            + ", ".join(label(i) for i in items))
     return items[prompt_choice(input_fn, title, [label(i) for i in items], filterable=True)]
 
 
@@ -217,10 +218,11 @@ def collect_cur(args: argparse.Namespace, session: Any, months: list[str]) -> tu
             source: cur.CurSource | None = cur.CurSource(
                 args.cur_bucket, args.cur_prefix.strip("/"), args.cur_bucket)
         else:
-            source = cur.discover_export(session, args.cur_export)
+            source = cur.discover(session, args.cur_export)
         if source is None:
             log("  CUR: no parquet Data Export with line_item_resource_id found (cost will be estimated)")
             return None, None
+        log(f"  CUR: s3://{source.bucket}/{source.base}")
         s3 = session.client("s3")
         rows: list[tuple[str, dict[str, Any]]] = []
         for month in months:
