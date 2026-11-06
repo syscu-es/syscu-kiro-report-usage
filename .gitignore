@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+
+# generated reports and downloaded data may contain user e-mails: never commit them
+kiro-report-*.html
+kiro-report-*.json
+.cache/
