@@ -10,13 +10,19 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, contabo]
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
+      - name: Runner info
+        run: |
+          uname -srm
+          (lsb_release -ds 2>/dev/null || grep PRETTY_NAME /etc/os-release || true)
+          echo "runner: ${RUNNER_NAME} (${RUNNER_OS}/${RUNNER_ARCH})"
+          (docker --version 2>/dev/null || echo "docker: not installed")
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
