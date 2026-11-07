@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "syscu-kiro-report-usage"
-version = "0.1.0"
+version = "0.1.1"
 description = "Self-contained HTML report of Kiro usage and cost per IAM Identity Center user (AWS CUR + Kiro user activity report)."
 readme = "README.md"
 requires-python = ">=3.10"

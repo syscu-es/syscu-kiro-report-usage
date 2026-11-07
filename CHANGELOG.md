@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-07
+
+Documentation and packaging metadata only; no behaviour changes.
+
 ### Added
 - Community files: `SECURITY.md`, `CONTRIBUTING.md`, issue and pull request templates.
 - Dependabot for GitHub Actions and Python dependencies.
@@ -13,6 +17,8 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 - CI no longer runs pull requests from forks on the self-hosted runner.
+- The release workflow publishes with `uv publish` (Trusted Publishing); the Docker-based PyPI action cannot see the workspace on the containerised self-hosted runners.
+- Repository history now uses the GitHub noreply address and generic fixture names.
 
 ## [0.1.0] - 2026-11-07
 
