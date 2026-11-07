@@ -7,7 +7,7 @@ name = "syscu-kiro-report-usage"
 version = "0.1.0"
 description = "Self-contained HTML report of Kiro usage and cost per IAM Identity Center user (AWS CUR + Kiro user activity report)."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = { text = "MIT" }
 keywords = ["kiro", "aws", "finops", "cost", "usage", "report", "iam-identity-center"]
 dependencies = ["boto3>=1.34", "pyarrow>=14"]
@@ -36,7 +36,7 @@ markers = ["unit: fast tests with no AWS access"]
 [tool.ruff]
 line-length = 110
 src = ["src", "tests"]
-target-version = "py39"
+target-version = "py310"
 
 [tool.ruff.lint]
 # explicit so local and CI results never depend on a user-level ruff config
