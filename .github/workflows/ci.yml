@@ -15,6 +15,10 @@ concurrency:
 
 jobs:
   test:
+    # SECURITY: this runner is self-hosted. Never run code from fork pull requests on it
+    # (a public repo accepts PRs from anyone). Pushes and same-repo PRs run normally;
+    # a maintainer reviews fork PRs and runs the checks locally before merging.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: [self-hosted, contabo]
     strategy:
       fail-fast: false

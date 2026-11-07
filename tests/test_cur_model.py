@@ -134,7 +134,7 @@ def test_demo_is_deterministic_and_complete():
     assert set(first["activity"]["clients"]) == {"CLI", "IDE", "WEB"}
 
 
-CUR_KEY = "cost/ticnow-report-cost/data/BILLING_PERIOD=2026-10/x-00001.snappy.parquet"
+CUR_KEY = "cost/acme-report-cost/data/BILLING_PERIOD=2026-10/x-00001.snappy.parquet"
 
 
 class FakeBuckets:
@@ -173,9 +173,9 @@ class SessionWith:
 def test_discover_by_scan_finds_the_cur_and_ignores_unrelated_keys_and_buckets():
     s3 = FakeBuckets({
         "photos": [CUR_KEY],  # name gives no billing hint: never scanned
-        "my-cost-bucket": ["cost/other.txt", "cost/ticnow-report-cost/metadata/BILLING_PERIOD=2026-10/m.json", CUR_KEY],
+        "my-cost-bucket": ["cost/other.txt", "cost/acme-report-cost/metadata/BILLING_PERIOD=2026-10/m.json", CUR_KEY],
     })
-    assert cur.discover_by_scan(s3) == cur.CurSource("my-cost-bucket", "cost/ticnow-report-cost/data", "ticnow-report-cost")
+    assert cur.discover_by_scan(s3) == cur.CurSource("my-cost-bucket", "cost/acme-report-cost/data", "acme-report-cost")
 
 
 @pytest.mark.unit
@@ -188,7 +188,7 @@ def test_discover_by_scan_returns_none_when_nothing_or_scan_cap_reached():
 def test_discover_falls_back_to_scan_only_when_the_api_is_denied():
     s3 = FakeBuckets({"cost-bucket": [CUR_KEY]})
     found = cur.discover(SessionWith(DeniedBcm("AccessDeniedException"), s3))
-    assert found == cur.CurSource("cost-bucket", "cost/ticnow-report-cost/data", "ticnow-report-cost")
+    assert found == cur.CurSource("cost-bucket", "cost/acme-report-cost/data", "acme-report-cost")
     with pytest.raises(ClientError):
         cur.discover(SessionWith(DeniedBcm("ThrottlingException"), s3))
 
