@@ -6,6 +6,9 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+- `kiro-report --version` reported `0.1.0` on 0.1.1: the version is now read from the installed package metadata instead of a second hard-coded copy.
+
 ## [0.1.1] - 2026-11-07
 
 Documentation and packaging metadata only; no behaviour changes.

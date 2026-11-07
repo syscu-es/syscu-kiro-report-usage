@@ -40,6 +40,24 @@ def test_render_without_logo_and_font_leaves_empty_sources():
     assert 'src=""' in html and "font/woff2" not in html
 
 
+# ---------------------------------------------------------------- version
+@pytest.mark.unit
+def test_version_matches_pyproject():
+    import re
+    from importlib.metadata import PackageNotFoundError, version
+    from pathlib import Path
+
+    from kiro_report import __version__
+
+    declared = re.search(r'^version = "([^"]+)"', Path(__file__).parents[1].joinpath("pyproject.toml")
+                         .read_text(encoding="utf-8"), re.MULTILINE).group(1)
+    try:
+        installed = version("syscu-kiro-report-usage")
+    except PackageNotFoundError:
+        pytest.skip("package not installed (running from the source tree)")
+    assert __version__ == installed == declared
+
+
 # -------------------------------------------------------------------- cli
 @pytest.mark.unit
 def test_cli_demo_writes_html_and_json(tmp_path):
