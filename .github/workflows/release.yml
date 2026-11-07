@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, contabo]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -41,7 +41,7 @@ jobs:
   publish-testpypi:
     if: github.event_name == 'workflow_dispatch' && inputs.target == 'testpypi'
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, contabo]
     environment: testpypi
     permissions:
       id-token: write # Trusted Publishing (OIDC)
@@ -57,7 +57,7 @@ jobs:
   publish-pypi:
     if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.target == 'pypi')
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, contabo]
     environment: pypi
     permissions:
       id-token: write # Trusted Publishing (OIDC)
