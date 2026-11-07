@@ -1,0 +1,61 @@
+name: Bug report
+description: Something does not work as documented
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not paste credentials, account IDs you consider private, or user e-mails.** Redact logs before posting.
+        Security problems: use *Security → Report a vulnerability* instead of an issue.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you expected and what you got.
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command you ran
+      description: Flags only (no secrets), e.g. `kiro-report --sso-start-url ... --last 3`.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output / error (redacted)
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: kiro-report version
+      description: Output of `kiro-report --version`.
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Python and OS
+      placeholder: "Python 3.12, macOS 15"
+    validations:
+      required: true
+  - type: dropdown
+    id: sources
+    attributes:
+      label: Data sources available
+      options:
+        - CUR and Kiro activity report
+        - Only CUR
+        - Only Kiro activity report
+        - Not sure
+  - type: dropdown
+    id: auth
+    attributes:
+      label: How do you authenticate?
+      options:
+        - Local profile (keys)
+        - Local SSO profile
+        - Sign-in with IAM Identity Center (--sso-start-url)
+        - Default credential chain / instance role

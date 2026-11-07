@@ -1,4 +1,9 @@
-# kiro-usage-report
+# syscu-kiro-report-usage
+
+[![CI](https://github.com/syscu-es/syscu-kiro-report-usage/actions/workflows/ci.yml/badge.svg)](https://github.com/syscu-es/syscu-kiro-report-usage/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/syscu-kiro-report-usage)](https://pypi.org/project/syscu-kiro-report-usage/)
+[![Python](https://img.shields.io/pypi/pyversions/syscu-kiro-report-usage)](https://pypi.org/project/syscu-kiro-report-usage/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 Generate a **single, self-contained HTML report** of [Kiro](https://kiro.dev) usage and cost **per IAM Identity Center user** — one command, no infrastructure to deploy.
 
@@ -15,6 +20,8 @@ It answers the questions Kiro administrators keep asking:
 The output is a static `.html` file (light/dark theme, English/Spanish, date-range and daily/weekly/monthly filters, tooltips, print-friendly). Share it as an attachment; nothing is uploaded anywhere.
 
 ## Quick start
+
+Requires Python 3.10+. AWS access is read-only ([permissions](docs/PERMISSIONS.md)) and is not needed for `--demo`.
 
 ```bash
 pip install syscu-kiro-report-usage            # from PyPI
@@ -100,6 +107,8 @@ ruff check .
 ```
 
 Plan prices/allowances live in `src/kiro_report/tiers.py` (Kiro pricing is subject to change).
+
+Contributions are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md). Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md). Changes are tracked in [CHANGELOG.md](CHANGELOG.md).
 
 ## Releasing
 
