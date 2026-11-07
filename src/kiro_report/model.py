@@ -124,7 +124,7 @@ def build_report(
             subtotal = sum(p["months"].get(month, {}).get("sub", 0.0) for p in people)
             costs[month] = {"sub": round(subtotal, 2), "offset": 0.0, "estimated": True}
 
-    activity_doc = _activity_document(activity, dict(zip(uids, range(len(uids)))), month_set)
+    activity_doc = _activity_document(activity, dict(zip(uids, range(len(uids)), strict=True)), month_set)
     cur_daily = {d: round(v, 1) for d, v in sorted((cur.daily if cur else {}).items())}
     dates = list(cur_daily) + [r[0] for r in (activity_doc["rows"] if activity_doc else [])]
 
