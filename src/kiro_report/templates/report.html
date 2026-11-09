@@ -69,6 +69,18 @@ td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-c
 .step{display:grid;grid-template-columns:150px 1fr;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
 .step .when{font-weight:650}.step.hoy .when{color:var(--crit)}.step.semana .when{color:var(--warn)}.step.mes .when{color:var(--info)}.step.cont .when{color:var(--ok)}
 .step h3{margin:0 0 2px}.step p{margin:0;color:var(--fg2)}
+.hbar.wide{grid-template-columns:190px 1fr 120px}.hbar.wide2{grid-template-columns:min(300px,38%) 1fr 90px}
+details.box{border:1px solid var(--line);border-radius:12px;background:var(--surface2);margin-top:14px;padding:0}
+details.box>summary{cursor:pointer;padding:9px 14px;font-weight:600;font-size:14px;color:var(--fg2);list-style:none}
+details.box>summary::-webkit-details-marker{display:none}details.box>summary::before{content:"▸ ";color:var(--accent)}details.box[open]>summary::before{content:"▾ "}
+details.box .inner{padding:2px 14px 14px;color:var(--fg2);font-size:14px}details.box .inner p{margin:6px 0}
+.ulist{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 14px;max-height:220px;overflow:auto;margin:8px 0}
+.ulist label{display:flex;gap:8px;align-items:center;font-size:13.5px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.donut{display:flex;gap:26px;align-items:center;flex-wrap:wrap}.donut svg{width:190px;height:190px;flex:none}
+.donut .center{fill:var(--fg);font-size:26px;font-weight:700;text-anchor:middle}.donut .centerl{fill:var(--muted);font-size:11px;text-anchor:middle}
+.seglist{display:grid;gap:8px;font-size:14px;flex:1;min-width:230px}.seglist div{display:grid;grid-template-columns:14px 1fr auto;gap:8px;align-items:center}
+.seglist i{width:10px;height:10px;border-radius:3px;display:block}.seglist small{display:block;color:var(--muted);font-size:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .muted{color:var(--muted)}.small{font-size:13px}.hidden{display:none!important}
 footer{border-top:1px solid var(--line);padding:30px 0 60px;color:var(--muted);font-size:13px}
 footer .fb{display:flex;align-items:center;gap:10px;margin-bottom:8px}footer img{height:22px}
@@ -80,7 +92,7 @@ footer .fb{display:flex;align-items:center;gap:10px;margin-bottom:8px}footer img
 <header class="top"><div class="wrap">
   <div class="brand"><img class="logo-l" alt="" src="__LOGO_LIGHT__"><img class="logo-d" alt="" src="__LOGO_DARK__"><span>__BRAND_NAME__</span>
     <span class="muted" style="font-weight:500">· Kiro</span></div>
-  <nav class="nav"><a href="#usage" data-i18n="nav_usage"></a><a href="#people" data-i18n="nav_people"></a><a href="#costs" data-i18n="nav_costs"></a><a href="#findings" data-i18n="nav_findings"></a>
+  <nav class="nav"><a href="#usage" data-i18n="nav_usage"></a><a href="#people" data-i18n="nav_people"></a><a href="#engagement" data-i18n="nav_eng"></a><a href="#costs" data-i18n="nav_costs"></a><a href="#findings" data-i18n="nav_findings"></a>
     <button id="lang" type="button">ES</button><button id="theme" type="button" data-i18n="theme"></button></nav>
 </div></header>
 
@@ -95,7 +107,9 @@ footer .fb{display:flex;align-items:center;gap:10px;margin-bottom:8px}footer img
 <section id="usage">
   <div class="mono eyebrow" data-i18n="s1_eyebrow"></div>
   <h2 data-i18n-html="s1_h2"></h2><p class="sub" data-i18n="s1_sub"></p>
-  <div class="card"><div class="controls" id="controls"></div></div>
+  <div class="card"><div class="controls" id="controls"></div>
+    <details class="box" id="ufilter"></details>
+    <details class="box"><summary data-i18n="defs_h"></summary><div class="inner" id="defs"></div></details></div>
   <div id="act-charts">
     <div class="grid2">
       <div class="card"><h3 data-i18n="c_cl"></h3><div class="chart" id="ch-cl"><div class="tip"></div></div><div class="legend" id="ch-cl-legend"></div></div>
@@ -107,6 +121,7 @@ footer .fb{display:flex;align-items:center;gap:10px;margin-bottom:8px}footer img
       <div class="card"><h3 data-i18n="c_upc"></h3><div id="hb-client"></div></div>
       <div class="card"><h3 data-i18n="c_mod"></h3><div id="hb-model"></div></div>
     </div>
+    <div class="card"><h3 data-i18n="c_wd"></h3><p class="note" id="wd-note"></p><div id="hb-wd"></div></div>
   </div>
   <div class="card" id="cur-daily-card"><h3 data-i18n="c_daily"></h3><p class="note" id="daily-note"></p>
     <div class="chart" id="ch-daily"><div class="tip"></div></div><p class="reading" id="daily-reading"></p></div>
@@ -117,7 +132,21 @@ footer .fb{display:flex;align-items:center;gap:10px;margin-bottom:8px}footer img
   <div class="mono eyebrow" data-i18n="s2_eyebrow"></div>
   <h2 data-i18n-html="s2_h2"></h2><p class="sub" id="s2-sub"></p>
   <div class="card"><h3 data-i18n="c_pm"></h3><div class="legend" id="ch-pm-legend"></div><div class="chart" id="ch-pm"><div class="tip"></div></div></div>
-  <div class="card"><h3 data-i18n="c_detail"></h3><p class="note" data-i18n="detail_note"></p><div class="tw"><table id="tbl"></table></div></div>
+  <div class="card"><h3 data-i18n="c_detail"></h3><p class="note" data-i18n="detail_note"></p><div class="tw"><table id="tbl"></table></div>
+    <div class="actions"><button type="button" id="exp-people" data-i18n="exp_people"></button></div></div>
+</section>
+
+<section id="engagement">
+  <div class="mono eyebrow" data-i18n="s5_eyebrow"></div>
+  <h2 data-i18n-html="s5_h2"></h2><p class="sub" id="s5-sub"></p>
+  <div class="grid2">
+    <div class="card"><h3 data-i18n="c_seg"></h3><div class="donut" id="seg"></div></div>
+    <div class="card"><h3 data-i18n="c_fun"></h3><p class="note" data-i18n="fun_note"></p><div id="funnel"></div></div>
+  </div>
+  <div class="card"><h3 data-i18n="c_top"></h3><div id="hb-top"></div></div>
+  <div class="card"><h3 data-i18n="c_tl"></h3><p class="note" data-i18n="tl_note"></p>
+    <div class="controls" id="eng-controls"></div><div class="tw"><table id="eng-tbl"></table></div>
+    <div class="actions"><button type="button" id="exp-eng" data-i18n="exp_eng"></button></div></div>
 </section>
 
 <section id="costs">
@@ -143,7 +172,22 @@ const META = D.meta, ACT = D.activity, NS = 'http://www.w3.org/2000/svg';
 let LANG = '__LANG__';
 const I18N = {
 en: {
-  nav_usage:'Usage', nav_people:'People', nav_costs:'Costs', nav_findings:'Findings', theme:'Theme',
+  nav_usage:'Usage', nav_people:'People', nav_eng:'Engagement', nav_costs:'Costs', nav_findings:'Findings', theme:'Theme',
+  uf_label:'Users', uf_all:'All users', uf_n:'{0} of {1} users', uf_clear:'Show all',
+  uf_note:'Filters usage, people and engagement. Costs and findings always cover everyone.',
+  defs_h:'Metric definitions',
+  defs_p:'<p><b>Credits</b>: Kiro credits consumed from the user plan on the day. <b>Overage</b>: credits beyond the plan allowance, billed per credit.</p><p><b>Messages</b>: messages exchanged with Kiro (prompts, tool calls and responses). <b>Conversations</b>: chats started by the user.</p><p><b>Client</b>: IDE, CLI or Web. <b>Plan use</b>: credits of the reference month over the plan allowance.</p><p><b>Active day</b>: a day with at least one message or credit used. <b>Days ago</b>: days between the user’s last active day and the last day with data.</p><p><b>Segments</b> (over the {0}-day period) by share of the plan allowance used: Power ≥ {1}% · Active ≥ {2}% · Light: any usage below that · Idle: none. The allowance is prorated to the period. Users whose plan is unknown fall back to messages: Power ≥ {3} messages or ≥ {4} conversations, Active ≥ {5} messages or ≥ {6} conversations.</p>',
+  s5_eyebrow:'03 · Engagement', s5_h2:'Who is <em>really using</em> Kiro.',
+  s5_sub:'Segments, funnel and last activity per user, from the user activity report. Use it to spot licences to coach or revoke.',
+  s5_period:'Period analysed: {0} days (thresholds scale above 30).',
+  c_seg:'Users by engagement level', c_fun:'Engagement funnel', fun_note:'Share of licensed users reaching each stage.',
+  c_top:'Top 10 users by messages', c_tl:'Activity timeline', tl_note:'Last activity is measured against the last day with data. Click a header to sort.',
+  seg_power:'Power', seg_active:'Active', seg_light:'Light', seg_idle:'Idle', seg_users:'users',
+  segd_power:'≥ {0}% of the plan allowance used', segd_active:'≥ {0}% of the plan allowance used', segd_light:'some usage, under {0}%', segd_idle:'no activity',
+  fun_all:'Licensed users', fun_used:'With any usage', fun_act:'Active or power (≥ 10% of plan)', fun_pow:'Power (≥ 50% of plan)',
+  col_seg:'Segment', col_last:'Last active', col_ago:'Days ago', col_adays:'Active days', col_puse:'Plan use', col_msgs:'Messages', col_cr:'Credits',
+  f_seg:'Segment', f_rec:'Last activity', rec_all:'Any', rec7:'≤ 7 days', rec30:'≤ 30 days', rec30p:'> 30 days', rec90p:'> 90 days',
+  exp_people:'Download people (CSV)', exp_eng:'Download engagement (CSV)', no_eng:'No users match the current filter.',
   eyebrow:'Usage report · Kiro · IAM Identity Center',
   s1_eyebrow:'01 · Usage', s1_h2:'Credit usage <em>over time</em>.',
   s1_sub:'Credits and activity of every Kiro user. Filter by date range, pick the granularity and hover a bar for the detail.',
@@ -159,16 +203,19 @@ en: {
   s2_sub:'Credits per user and month. “Plan use” compares the credits of {0} with the plan allowance (Pro 1,000 · Pro+ 2,000 · Pro Max 5,000 · Power 10,000).',
   c_pm:'Credits per person and month', c_detail:'Detail per person', detail_note:'Click a header to sort. The current month is incomplete.',
   col_person:'Person', col_plan:'Plan', col_clients:'Clients', col_total:'Total', col_sub:'Subscription', col_use:'Plan use', col_over:'Overage', col_rec:'Suggestion',
-  s3_eyebrow:'03 · Costs', s3_h2:'Subscriptions <em>and AWS credit</em>.',
+  s3_eyebrow:'04 · Costs', s3_h2:'Subscriptions <em>and AWS credit</em>.',
   s3_sub:'Monthly subscription at list price by plan, and the AWS credit applied. Kiro credit usage itself shows as $0.00 in the CUR.',
   c_subs:'Subscriptions by month and plan', subs_note:'USD at list price; above each bar, the net after the credit.',
   subs_note_est:'USD estimated at list price from the plan of each active user (no CUR available).',
   col_month:'Month', col_subs:'Subscriptions', col_credit:'AWS credit', col_net:'Net', col_used:'Kiro credits used', in_progress:'in progress', est:'estimated',
-  s4_eyebrow:'04 · Findings', s4_h2:'What to <em>review</em>.', s4_sub:'Computed automatically from the data of the period.',
+  s4_eyebrow:'05 · Findings', s4_h2:'What to <em>review</em>.', s4_sub:'Computed automatically from the data of the period.',
   w_now:'Today', w_week:'This week', w_month:'This month', w_cont:'Ongoing',
   f_net_t:'Net not covered in {0}', f_net_p:'The {0} subscription ({1}) has no AWS credit attached yet. Confirm the credit lands at month end; otherwise that is the real spend.',
   f_over_t:'Users in overage', f_over_p:'{0} used more than their plan in {1}: {2}. Overage is billed at ${3} per credit.',
   f_rec_t:'Right-size plans (up to {0}/month)', f_rec_p:'{0}. Based on the credits of {1}, overage cost included.',
+  f_proj_t:'Projected overage in {0}', f_proj_p:'At the current pace {0} will exceed their plan in {1}: {2}. Estimated overage ≈ ${3} (indicative: based on the first {4} days of the month; a burst early in the month inflates it).',
+  f_near_t:'Close to the plan limit', f_near_p:'{0} are on pace to use over 80% of their plan in {1}: {2} (indicative, {3} days of data).',
+  c_wd:'Credits by day of week', wd_note:'Weekend share: {0}% of the credits. Weekend or off-hours usage can point to automation or shared accounts.',
   f_zero_t:'Licences with no usage', f_zero_p:'{0} did not use Kiro in the period. Consider revoking the licence.',
   f_act_t:'Enable the user activity report', f_act_p:'It adds client type (IDE/CLI/Web), plan, model, messages and overage per user and day, which the CUR does not carry.',
   f_cur_t:'Add the Cost and Usage Report', f_cur_p:'Costs here are estimated at list price. A CUR Data Export (parquet, with resource IDs) provides the real subscription lines and AWS credits.',
@@ -187,7 +234,22 @@ en: {
   foot:'Report generated automatically · {0}'
 },
 es: {
-  nav_usage:'Consumo', nav_people:'Personas', nav_costs:'Costos', nav_findings:'Hallazgos', theme:'Tema',
+  nav_usage:'Consumo', nav_people:'Personas', nav_eng:'Engagement', nav_costs:'Costos', nav_findings:'Hallazgos', theme:'Tema',
+  uf_label:'Usuarios', uf_all:'Todos los usuarios', uf_n:'{0} de {1} usuarios', uf_clear:'Mostrar todos',
+  uf_note:'Filtra consumo, personas y engagement. Costos y hallazgos siempre incluyen a todos.',
+  defs_h:'Definiciones de métricas',
+  defs_p:'<p><b>Créditos</b>: créditos de Kiro consumidos del plan del usuario ese día. <b>Overage</b>: créditos por encima del tope del plan, facturados por crédito.</p><p><b>Mensajes</b>: mensajes intercambiados con Kiro (prompts, llamadas a herramientas y respuestas). <b>Conversaciones</b>: chats iniciados por el usuario.</p><p><b>Cliente</b>: IDE, CLI o Web. <b>Uso del plan</b>: créditos del mes de referencia sobre el tope del plan.</p><p><b>Día activo</b>: día con al menos un mensaje o crédito usado. <b>Días atrás</b>: días entre el último día activo del usuario y el último día con datos.</p><p><b>Segmentos</b> (en el período de {0} días) según el porcentaje del tope del plan usado: Power ≥ {1}% · Activo ≥ {2}% · Ligero: algo de uso por debajo · Inactivo: ninguno. El tope se prorratea al período. Si el plan es desconocido se usan mensajes: Power ≥ {3} mensajes o ≥ {4} conversaciones, Activo ≥ {5} mensajes o ≥ {6} conversaciones.</p>',
+  s5_eyebrow:'03 · Engagement', s5_h2:'Quién <em>usa de verdad</em> Kiro.',
+  s5_sub:'Segmentos, embudo y última actividad por usuario, a partir del reporte de actividad. Sirve para detectar licencias a impulsar o revocar.',
+  s5_period:'Período analizado: {0} días (los umbrales escalan por encima de 30).',
+  c_seg:'Usuarios por nivel de engagement', c_fun:'Embudo de engagement', fun_note:'Proporción de usuarios con licencia que alcanza cada etapa.',
+  c_top:'Top 10 usuarios por mensajes', c_tl:'Línea de tiempo de actividad', tl_note:'La última actividad se mide contra el último día con datos. Clic en un encabezado para ordenar.',
+  seg_power:'Power', seg_active:'Activo', seg_light:'Ligero', seg_idle:'Inactivo', seg_users:'usuarios',
+  segd_power:'≥ {0}% del tope del plan usado', segd_active:'≥ {0}% del tope del plan usado', segd_light:'algo de uso, menos de {0}%', segd_idle:'sin actividad',
+  fun_all:'Usuarios con licencia', fun_used:'Con algún uso', fun_act:'Activos o power (≥ 10% del plan)', fun_pow:'Power (≥ 50% del plan)',
+  col_seg:'Segmento', col_last:'Última actividad', col_ago:'Días atrás', col_adays:'Días activos', col_puse:'Uso del plan', col_msgs:'Mensajes', col_cr:'Créditos',
+  f_seg:'Segmento', f_rec:'Última actividad', rec_all:'Cualquiera', rec7:'≤ 7 días', rec30:'≤ 30 días', rec30p:'> 30 días', rec90p:'> 90 días',
+  exp_people:'Descargar personas (CSV)', exp_eng:'Descargar engagement (CSV)', no_eng:'Ningún usuario coincide con el filtro.',
   eyebrow:'Informe de uso · Kiro · IAM Identity Center',
   s1_eyebrow:'01 · Consumo', s1_h2:'Consumo de créditos <em>en el tiempo</em>.',
   s1_sub:'Créditos y actividad de todos los usuarios de Kiro. Filtra por rango de fechas, elige la granularidad y pasa el ratón por una barra para ver el detalle.',
@@ -203,16 +265,19 @@ es: {
   s2_sub:'Créditos por usuario y mes. “Uso del plan” compara los créditos de {0} con el tope del plan (Pro 1.000 · Pro+ 2.000 · Pro Max 5.000 · Power 10.000).',
   c_pm:'Créditos por persona y mes', c_detail:'Detalle por persona', detail_note:'Clic en un encabezado para ordenar. El mes en curso está incompleto.',
   col_person:'Persona', col_plan:'Plan', col_clients:'Clientes', col_total:'Total', col_sub:'Suscripción', col_use:'Uso del plan', col_over:'Overage', col_rec:'Sugerencia',
-  s3_eyebrow:'03 · Costos', s3_h2:'Suscripciones <em>y crédito AWS</em>.',
+  s3_eyebrow:'04 · Costos', s3_h2:'Suscripciones <em>y crédito AWS</em>.',
   s3_sub:'Suscripción mensual a precio de lista por plan y crédito de AWS aplicado. El uso de créditos de Kiro sale a $0,00 en el CUR.',
   c_subs:'Suscripciones por mes y plan', subs_note:'USD a precio de lista; encima de cada barra, el neto tras el crédito.',
   subs_note_est:'USD estimados a precio de lista según el plan de cada usuario activo (sin CUR disponible).',
   col_month:'Mes', col_subs:'Suscripciones', col_credit:'Crédito AWS', col_net:'Neto', col_used:'Créditos Kiro usados', in_progress:'en curso', est:'estimado',
-  s4_eyebrow:'04 · Hallazgos', s4_h2:'Qué <em>revisar</em>.', s4_sub:'Calculado automáticamente con los datos del período.',
+  s4_eyebrow:'05 · Hallazgos', s4_h2:'Qué <em>revisar</em>.', s4_sub:'Calculado automáticamente con los datos del período.',
   w_now:'Hoy', w_week:'Esta semana', w_month:'Este mes', w_cont:'Continuo',
   f_net_t:'Neto sin cubrir en {0}', f_net_p:'La suscripción de {0} ({1}) aún no tiene crédito AWS asociado. Confirma que el crédito se aplica al cierre del mes; si no, ese será el gasto real.',
   f_over_t:'Usuarios en overage', f_over_p:'{0} superaron su plan en {1}: {2}. El overage se factura a ${3} por crédito.',
   f_rec_t:'Ajustar planes (hasta {0}/mes)', f_rec_p:'{0}. Basado en los créditos de {1}, incluido el costo de overage.',
+  f_proj_t:'Overage proyectado en {0}', f_proj_p:'Al ritmo actual {0} superarán su plan en {1}: {2}. Overage estimado ≈ ${3} (indicativo: basado en los primeros {4} días del mes; una ráfaga al inicio lo infla).',
+  f_near_t:'Cerca del límite del plan', f_near_p:'{0} van camino de usar más del 80% de su plan en {1}: {2} (indicativo, {3} días de datos).',
+  c_wd:'Créditos por día de la semana', wd_note:'Fin de semana: {0}% de los créditos. El uso en fin de semana o fuera de horario puede indicar automatización o cuentas compartidas.',
   f_zero_t:'Licencias sin uso', f_zero_p:'{0} no usaron Kiro en el período. Evalúa revocar la licencia.',
   f_act_t:'Activar el reporte de actividad de usuarios', f_act_p:'Añade cliente (IDE/CLI/Web), plan, modelo, mensajes y overage por usuario y día, que el CUR no trae.',
   f_cur_t:'Añadir el Cost and Usage Report', f_cur_p:'Los costos aquí son estimados a precio de lista. Un Data Export del CUR (parquet, con resource IDs) aporta las líneas reales de suscripción y los créditos AWS.',
@@ -256,24 +321,41 @@ const palette = () => [css('--s1'), css('--s2'), css('--s3'), css('--s4'), css('
 const CLIENT_COLOR = {IDE: 0, CLI: 1, WEB: 2, PLUGIN: 3};
 const PLAN_COLOR = {Pro: 2, ProPlus: 3, ProMax: 1, Power: 0};
 const colorOf = (map, name, i) => palette()[map[name] ?? Math.min(4, 3 + i)];
+/* user names come from e-mails in the data: always escape before innerHTML */
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+/* CSV: quote cells and neutralise spreadsheet formulas (=, +, -, @) in text */
+const csvCell = v => {
+  let s = String(v ?? '');
+  if (typeof v === 'string' && /^[=+\-@\t\r]/.test(s)) s = "'" + s;
+  return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+};
+function downloadCsv(name, table) {
+  const blob = new Blob(['﻿' + table.map(r => r.map(csvCell).join(',')).join('\r\n')], {type: 'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+const SEG_COLOR = {power: 's1', active: 's3', light: 's4', idle: 's2'}, SEG_TONE = {power: 'info', active: 'ok', light: 'warn', idle: 'crit'};
+const SEGS = ['power', 'active', 'light', 'idle'];
 
 /* ---------- derived data ---------- */
-const state = {range: 'all', gran: 'day'};
+const state = {range: 'all', gran: 'day', users: null, eseg: 'all', erec: 'all'};
 const active = META.months.filter(m => D.people.some(p => p.months[m]));
 const refM = META.ref_month, curM = active[active.length - 1];
-const rows = D.people.map(p => {
+const rows = D.people.map((p, i) => {
   const per = active.map(m => (p.months[m] || {credits: 0}).credits);
   const lastM = [...active].reverse().find(m => p.months[m]);
   const ref = p.months[refM] || {};
   const get = f => active.map(m => (p.months[m] || {})[f]);
-  return {user: p.user, per, total: sum(per), plan: lastM ? p.months[lastM].plan : '-', sub: sum(get('sub').map(v => v || 0)),
+  return {i, eng: p.eng, user: p.user, per, total: sum(per), plan: lastM ? p.months[lastM].plan : '-', sub: sum(get('sub').map(v => v || 0)),
     use: ref.util || 0, over: sum(get('overage').map(v => v || 0)), clients: [...new Set(get('clients').flat().filter(Boolean))],
-    rec: p.rec, refCredits: ref.credits || 0, refOver: ref.overage || 0};
+    rec: p.rec, proj: p.proj, refCredits: ref.credits || 0, refOver: ref.overage || 0};
 }).sort((a, b) => b.total - a.total);
 const totalCr = sum(rows.map(r => r.total));
 const costOf = m => D.costs[m] || {sub: 0, offset: 0, estimated: META.estimated_costs};
 const totalSub = sum(active.map(m => costOf(m).sub)), offset = sum(active.map(m => costOf(m).offset));
 const curNet = curM ? costOf(curM).sub + costOf(curM).offset : 0;
+const userOk = i => !state.users || state.users.has(i);
+const vrows = () => rows.filter(r => userOk(r.i));
 const recs = rows.filter(r => r.rec);
 const saveTotal = sum(recs.map(r => r.rec.saving));
 
@@ -297,7 +379,7 @@ function renderHero() {
     k.push([ov > 0 ? 'warn' : 'ok', fmt(ov), t('k_over')]);
   }
   $('kpis').innerHTML = k.map(([c, v, l]) => `<div class="kpi ${c}"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
-  $('meta').innerHTML = [t('m_ro'), t('m_data', META.last_date), t('m_acct', META.account), t('m_users', rows.length), META.demo ? t('m_demo') : '']
+  $('meta').innerHTML = [t('m_ro'), t('m_data', META.last_date), t('m_acct', esc(META.account)), t('m_users', rows.length), META.demo ? t('m_demo') : '']
     .filter(Boolean).map(x => `<span>${x}</span>`).join('');
 }
 
@@ -335,7 +417,7 @@ const hideTip = host => { host.querySelector('.tip').style.display = 'none'; };
 function stacked(id, labels, ser, colors, o = {}) {
   const host = $(id); clearSvg(host);
   const legend = $(id + '-legend');
-  if (legend) legend.innerHTML = ser.map((s, i) => `<span><i style="background:${colors[i]}"></i>${s.name}</span>`).join('');
+  if (legend) legend.innerHTML = ser.map((s, i) => `<span><i style="background:${colors[i]}"></i>${esc(s.name)}</span>`).join('');
   if (!labels.length) return;
   const W = 1000, H = o.h || 240, pl = 52, pb = 26, pt = 18, vf = o.fmt || fmt;
   const max = niceMax(Math.max(1, ...labels.map((_, i) => sum(ser.map(s => s.values[i])))));
@@ -354,18 +436,18 @@ function stacked(id, labels, ser, colors, o = {}) {
     if (i % step === 0) el('text', {x: x + bw / 2, y: H - 8, 'text-anchor': 'middle'}, svg).textContent = (o.label || (b => b))(lb);
     const hit = el('rect', {x, y: pt, width: bw, height: H - pt - pb, fill: 'transparent'}, svg);
     hit.addEventListener('mousemove', () => showTip(host, `<b>${(o.label || (b => b))(lb)}</b>` +
-      ser.filter(s => s.values[i]).map((s, _, a) => `<div><span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${colors[ser.indexOf(s)]};margin-right:6px"></i>${s.name}</span><span>${vf(s.values[i])}</span></div>`).join('') +
+      ser.filter(s => s.values[i]).map((s, _, a) => `<div><span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${colors[ser.indexOf(s)]};margin-right:6px"></i>${esc(s.name)}</span><span>${vf(s.values[i])}</span></div>`).join('') +
       (o.extra ? o.extra(i) : ''), x + bw, W));
     hit.addEventListener('mouseleave', () => hideTip(host));
   });
 }
-function hbars(id, items, vf) {
+function hbars(id, items, vf, cls = '') {
   const max = Math.max(1, ...items.map(i => i.value));
-  $(id).innerHTML = items.length ? items.map(i => `<div class="hbar"><span>${i.name}</span><div class="t"><i style="width:${i.value / max * 100}%;background:${i.color}"></i></div><span class="n">${vf(i.value)}</span></div>`).join('') : '<p class="muted small">—</p>';
+  $(id).innerHTML = items.length ? items.map(i => `<div class="hbar ${cls}"><span>${esc(i.name)}</span><div class="t"><i style="width:${i.value / max * 100}%;background:${i.color}"></i></div><span class="n">${vf(i.value)}</span></div>`).join('') : '<p class="muted small">—</p>';
 }
 function renderActivity() {
   if (!ACT) return;
-  const from = rangeStart(), rowsIn = ACT.rows.filter(r => r[0] >= from);
+  const from = rangeStart(), rowsIn = ACT.rows.filter(r => r[0] >= from && userOk(r[1]));
   const dates = rowsIn.map(r => r[0]);
   const labels = dates.length ? bucketList(dates.reduce((a, b) => a < b ? a : b), dates.reduce((a, b) => a > b ? a : b)) : [];
   const clients = ACT.clients, tiers = ACT.tiers;
@@ -377,6 +459,10 @@ function renderActivity() {
   stacked('ch-ucl', labels, series(rowsIn, clients, r => clients[r[2]], 'users', labels), cc, {...opts});
   const uplan = series(rowsIn, tiers, r => tiers[r[3]], 'users', labels).map((s, i) => ({...s, name: planLabel(tiers[i])}));
   stacked('ch-upl', labels, uplan, pc, {...opts});
+  const wd = [0, 0, 0, 0, 0, 0, 0]; rowsIn.forEach(r => { wd[(parseIso(r[0]).getUTCDay() + 6) % 7] += r[4]; });
+  const wdTotal = sum(wd), wdName = i => new Date(Date.UTC(2024, 0, 1 + i)).toLocaleDateString(LOC(), {weekday: 'long', timeZone: 'UTC'});
+  hbars('hb-wd', wd.map((v, i) => ({name: wdName(i), value: v, color: i >= 5 ? palette()[1] : palette()[0]})), compact, 'wide');
+  $('wd-note').textContent = wdTotal ? t('wd_note', Math.round((wd[5] + wd[6]) / wdTotal * 100)) : '';
   hbars('hb-client', clients.map((c, i) => ({name: c, value: sum(rowsIn.filter(r => r[2] === i).map(r => r[4])), color: cc[i]})).sort((a, b) => b.value - a.value), compact);
   const mt = ACT.models.map(() => 0); rowsIn.forEach(r => { for (const k in r[9]) mt[+k] += r[9][k]; });
   hbars('hb-model', ACT.models.map((n, i) => ({name: n, value: mt[i], color: palette()[0]})).filter(x => x.value > 0).sort((a, b) => b.value - a.value).slice(0, 8), compact);
@@ -408,7 +494,8 @@ function renderPeople() {
   const pal = palette();
   $('ch-pm-legend').innerHTML = active.map((m, i) => `<span><i style="background:${pal[i % 5]}"></i>${mlabel(m)}</span>`).join('');
   const host = $('ch-pm'); clearSvg(host);
-  const top = rows.filter(r => r.total > 0); if (!top.length) return;
+  const top = vrows().filter(r => r.total > 0);
+  if (!top.length) { drawTable(); return; }
   const W = 1000, rh = 26, H = top.length * rh + 8, pl = 190, max = Math.max(...top.map(r => r.total));
   const svg = el('svg', {viewBox: `0 0 ${W} ${H}`, role: 'img'}, host); host.insertBefore(svg, host.firstChild);
   top.forEach((r, j) => {
@@ -416,7 +503,7 @@ function renderPeople() {
     el('text', {x: pl - 10, y: y + 13, 'text-anchor': 'end', style: `fill:${css('--fg2')};font-size:12px`}, svg).textContent = r.user;
     r.per.forEach((v, i) => { const w = (W - pl - 70) * v / max; if (v <= 0) return; const x0 = x;
       const rect = el('rect', {x, y, width: w, height: rh - 10, fill: pal[i % 5]}, svg);
-      rect.addEventListener('mousemove', () => showTip(host, `<b>${r.user}</b><div><span>${mlabel(active[i])}</span><span>${fmt(v)}</span></div>`, x0 + w / 2, W));
+      rect.addEventListener('mousemove', () => showTip(host, `<b>${esc(r.user)}</b><div><span>${mlabel(active[i])}</span><span>${fmt(v)}</span></div>`, x0 + w / 2, W));
       rect.addEventListener('mouseleave', () => hideTip(host)); x += w; });
     el('text', {x: x + 6, y: y + 13}, svg).textContent = fmt(r.total);
   });
@@ -427,23 +514,131 @@ function drawTable() {
   const cols = [['user', 'col_person'], ['plan', 'col_plan']].concat(ACT ? [['clients', 'col_clients']] : []).concat(active.map((m, i) => ['m' + i, null, mlabel(m)]))
     .concat([['total', 'col_total'], ['sub', 'col_sub'], ['use', 'col_use']]).concat(ACT ? [['over', 'col_over']] : []).concat([['rec', 'col_rec']]);
   const val = (r, k) => /^m\d+$/.test(k) ? r.per[+k.slice(1)] : k === 'clients' ? r.clients.join(',') : k === 'rec' ? (r.rec ? r.rec.saving : 0) : r[k];
-  const sorted = [...rows].sort((a, b) => { const x = val(a, sortKey), y = val(b, sortKey); return (typeof x === 'string' ? x.localeCompare(y) : x - y) * (asc ? 1 : -1); });
-  const max = Math.max(1, ...rows.map(r => r.total));
+  const list = vrows();
+  const sorted = [...list].sort((a, b) => { const x = val(a, sortKey), y = val(b, sortKey); return (typeof x === 'string' ? x.localeCompare(y) : x - y) * (asc ? 1 : -1); });
+  const max = Math.max(1, ...list.map(r => r.total));
   const isNum = k => !['user', 'plan', 'clients', 'rec'].includes(k);
   let h = '<thead><tr>' + cols.map(([k, key, lit]) => `<th class="${isNum(k) ? 'num' : ''}" data-k="${k}">${key ? t(key) : lit}${k === sortKey ? (asc ? ' ▲' : ' ▼') : ''}</th>`).join('') + '</tr></thead><tbody>';
   sorted.forEach(r => {
     const tone = r.use < 10 ? 'crit' : r.use < 50 ? 'warn' : r.use > 100 ? 'crit' : 'ok';
-    h += `<tr><td>${r.user}</td><td><span class="pill info">${planLabel(r.plan)}</span></td>` + (ACT ? `<td class="muted">${r.clients.join(', ') || '–'}</td>` : '') +
+    h += `<tr><td>${esc(r.user)}</td><td><span class="pill info">${esc(planLabel(r.plan))}</span></td>` + (ACT ? `<td class="muted">${esc(r.clients.join(', ')) || '–'}</td>` : '') +
       r.per.map(v => `<td class="num">${v ? fmt(v) : '–'}</td>`).join('') +
       `<td class="num">${fmt(r.total)}<div class="bar"><i style="width:${r.total / max * 100}%"></i></div></td><td class="num">${usd(r.sub)}</td><td class="num"><span class="pill ${tone}">${Math.round(r.use)}%</span></td>` +
       (ACT ? `<td class="num">${r.over ? fmt(r.over) : '–'}</td>` : '') +
-      `<td>${r.rec ? `→ <b>${planLabel(r.rec.to)}</b> <span class="muted">(−$${r.rec.saving})</span>` : '<span class="muted">–</span>'}</td></tr>`;
+      `<td>${r.rec ? `→ <b>${esc(planLabel(r.rec.to))}</b> <span class="muted">(−$${r.rec.saving})</span>` : '<span class="muted">–</span>'}</td></tr>`;
   });
-  const tot = active.map((_, i) => sum(rows.map(r => r.per[i])));
+  const tot = active.map((_, i) => sum(list.map(r => r.per[i])));
   h += '</tbody><tfoot><tr><td>' + t('total') + '</td><td></td>' + (ACT ? '<td></td>' : '') + tot.map(v => `<td class="num">${fmt(v)}</td>`).join('') +
-    `<td class="num">${fmt(totalCr)}</td><td class="num">${usd(totalSub)}</td><td></td>` + (ACT ? `<td class="num">${fmt(sum(rows.map(r => r.over)))}</td>` : '') + '<td></td></tr></tfoot>';
+    `<td class="num">${fmt(sum(list.map(r => r.total)))}</td><td class="num">${usd(sum(list.map(r => r.sub)))}</td><td></td>` + (ACT ? `<td class="num">${fmt(sum(list.map(r => r.over)))}</td>` : '') + '<td></td></tr></tfoot>';
   const tb = $('tbl'); tb.innerHTML = h;
   tb.querySelectorAll('th').forEach(th => th.onclick = () => { const k = th.dataset.k; asc = (k === sortKey) ? !asc : false; sortKey = k; drawTable(); });
+}
+
+/* ---------- user filter and definitions ---------- */
+function ufSummary() {
+  return state.users ? t('uf_n', state.users.size, rows.length) : t('uf_all');
+}
+function renderUserFilter() {
+  const box = $('ufilter'); box.classList.toggle('hidden', rows.length < 2);
+  box.innerHTML = `<summary>${t('uf_label')}: <span id="uf-sum">${ufSummary()}</span></summary><div class="inner"><p class="muted small">${t('uf_note')}</p>` +
+    `<div class="ulist">${[...rows].sort((a, b) => a.user.localeCompare(b.user)).map(r =>
+      `<label><input type="checkbox" data-i="${r.i}" ${userOk(r.i) ? 'checked' : ''}> ${esc(r.user)}</label>`).join('')}</div>` +
+    `<button type="button" id="uf-clear">${t('uf_clear')}</button></div>`;
+  box.querySelectorAll('input[type=checkbox]').forEach(cb => cb.onchange = () => {
+    const picked = new Set([...box.querySelectorAll('input:checked')].map(c => +c.dataset.i));
+    state.users = picked.size === rows.length ? null : picked;
+    $('uf-sum').textContent = ufSummary(); renderFiltered();
+  });
+  $('uf-clear').onclick = () => { state.users = null; renderUserFilter(); renderFiltered(); };
+}
+function renderFiltered() { renderActivity(); renderPeople(); renderEngagement(); }
+function renderDefs() {
+  const th = META.thresholds;
+  $('defs').innerHTML = th ? t('defs_p', META.period_days, th.power_use, th.active_use, th.power_messages, th.power_conversations, th.active_messages, th.active_conversations)
+    : t('defs_p', '–', '–', '–', '–', '–', '–', '–');
+}
+
+/* ---------- engagement ---------- */
+function donut(host, items, total) {
+  const R = 70, C = 2 * Math.PI * R; let off = 0;
+  const svg = el('svg', {viewBox: '0 0 200 200', role: 'img'});
+  el('circle', {cx: 100, cy: 100, r: R, fill: 'none', stroke: css('--surface2'), 'stroke-width': 28}, svg);
+  items.filter(i => i.value > 0).forEach(i => {
+    const len = C * i.value / total;
+    el('circle', {cx: 100, cy: 100, r: R, fill: 'none', stroke: i.color, 'stroke-width': 28, 'stroke-dasharray': `${len} ${C - len}`,
+      'stroke-dashoffset': -off, transform: 'rotate(-90 100 100)'}, svg); off += len;
+  });
+  el('text', {x: 100, y: 106, class: 'center'}, svg).textContent = total;
+  el('text', {x: 100, y: 126, class: 'centerl'}, svg).textContent = t('seg_users');
+  return svg;
+}
+function engRows() { return vrows().filter(r => r.eng); }
+const agoOf = r => r.eng.days_since_last == null ? Infinity : r.eng.days_since_last;
+function recencyOk(r) {
+  const d = agoOf(r), f = state.erec;
+  return f === 'all' || (f === '7' && d <= 7) || (f === '30' && d <= 30) || (f === '30p' && d > 30) || (f === '90p' && d > 90);
+}
+let eKey = 'ago', eAsc = true;
+function renderEngagement() {
+  const all = engRows(), sec = $('engagement');
+  const none = !ACT || !rows.some(r => r.eng);
+  sec.classList.toggle('hidden', none);
+  document.querySelectorAll('a[href="#engagement"]').forEach(a => a.classList.toggle('hidden', none));
+  if (none) return;
+  $('s5-sub').textContent = t('s5_sub') + ' ' + t('s5_period', META.period_days);
+  const th = META.thresholds, pal = {s1: css('--s1'), s2: css('--s2'), s3: css('--s3'), s4: css('--s4')};
+  const counts = Object.fromEntries(SEGS.map(s => [s, all.filter(r => r.eng.segment === s).length]));
+  const total = all.length;
+  const host = $('seg'); host.innerHTML = '';
+  if (!total) { host.innerHTML = `<p class="muted small">${t('no_eng')}</p>`; $('funnel').innerHTML = ''; $('hb-top').innerHTML = ''; $('eng-tbl').innerHTML = ''; return; }
+  host.appendChild(donut(host, SEGS.map(s => ({value: counts[s], color: pal[SEG_COLOR[s]]})), total));
+  const detail = {power: t('segd_power', th.power_use), active: t('segd_active', th.active_use),
+    light: t('segd_light', th.active_use), idle: t('segd_idle')};
+  const list = document.createElement('div'); list.className = 'seglist';
+  list.innerHTML = SEGS.map(s => `<div><i style="background:${pal[SEG_COLOR[s]]}"></i><span><b>${t('seg_' + s)}</b><small>${detail[s]}</small></span>` +
+    `<span class="num">${counts[s]} · ${Math.round(counts[s] / total * 100)}%</span></div>`).join('');
+  host.appendChild(list);
+  const stages = [['fun_all', total], ['fun_used', total - counts.idle], ['fun_act', counts.power + counts.active], ['fun_pow', counts.power]];
+  hbars('funnel', stages.map(([k, v], i) => ({name: t(k), value: v, color: pal.s1})), v => `${v} · ${Math.round(v / total * 100)}%`, 'wide');
+  hbars('hb-top', [...all].sort((a, b) => b.eng.messages - a.eng.messages).slice(0, 10).filter(r => r.eng.messages > 0)
+    .map(r => ({name: r.user, value: r.eng.messages, color: pal.s1})), fmt, 'wide2');
+  renderEngControls(); drawEngTable(all);
+}
+function renderEngControls() {
+  const grp = (lab, key, opts) => `<div class="grp"><span class="lab">${t(lab)}</span>` +
+    opts.map(([v, l]) => `<button type="button" class="${state[key] === v ? 'on' : ''}" data-k="${key}" data-v="${v}">${l}</button>`).join('') + '</div>';
+  $('eng-controls').innerHTML = grp('f_seg', 'eseg', [['all', t('rec_all')], ...SEGS.map(s => [s, t('seg_' + s)])]) +
+    grp('f_rec', 'erec', [['all', t('rec_all')], ['7', t('rec7')], ['30', t('rec30')], ['30p', t('rec30p')], ['90p', t('rec90p')]]);
+  $('eng-controls').querySelectorAll('button').forEach(b => b.onclick = () => { state[b.dataset.k] = b.dataset.v; renderEngagement(); });
+}
+function engView(all) {
+  const val = (r, k) => ({user: r.user.toLowerCase(), seg: SEGS.indexOf(r.eng.segment), last: r.eng.last_date, ago: agoOf(r), days: r.eng.active_days, puse: r.eng.use ?? -1,
+    msgs: r.eng.messages, cr: r.total}[k]);
+  return all.filter(r => (state.eseg === 'all' || r.eng.segment === state.eseg) && recencyOk(r))
+    .sort((a, b) => { const x = val(a, eKey), y = val(b, eKey); const c = typeof x === 'string' ? x.localeCompare(y) : (x === y ? 0 : x < y ? -1 : 1); return c * (eAsc ? 1 : -1); });
+}
+function drawEngTable(all) {
+  const cols = [['user', 'col_person'], ['seg', 'col_seg'], ['last', 'col_last'], ['ago', 'col_ago'], ['days', 'col_adays'], ['puse', 'col_puse'], ['msgs', 'col_msgs'], ['cr', 'col_cr']];
+  const num = k => ['ago', 'days', 'puse', 'msgs', 'cr'].includes(k);
+  const view = engView(all);
+  let h = '<thead><tr>' + cols.map(([k, key]) => `<th class="${num(k) ? 'num' : ''}" data-k="${k}">${t(key)}${k === eKey ? (eAsc ? ' ▲' : ' ▼') : ''}</th>`).join('') + '</tr></thead><tbody>';
+  h += view.length ? view.map(r => `<tr><td>${esc(r.user)}</td><td><span class="pill ${SEG_TONE[r.eng.segment]}">${t('seg_' + r.eng.segment)}</span></td>` +
+    `<td>${esc(r.eng.last_date) || '–'}</td><td class="num">${r.eng.days_since_last == null ? '–' : r.eng.days_since_last}</td><td class="num">${r.eng.active_days}</td>` +
+    `<td class="num">${r.eng.use == null ? '–' : Math.round(r.eng.use) + '%'}</td><td class="num">${fmt(r.eng.messages)}</td><td class="num">${fmt(r.total)}</td></tr>`).join('') : `<tr><td colspan="8" class="muted">${t('no_eng')}</td></tr>`;
+  const tb = $('eng-tbl'); tb.innerHTML = h + '</tbody>';
+  tb.querySelectorAll('th').forEach(th => th.onclick = () => { const k = th.dataset.k; eAsc = (k === eKey) ? !eAsc : (k === 'ago' || k === 'user' || k === 'seg'); eKey = k; drawEngTable(all); });
+}
+
+/* ---------- exports (client side, nothing leaves the page) ---------- */
+function exportPeople() {
+  const head = [t('col_person'), t('col_plan'), ...active.map(mlabel), t('col_total'), t('col_sub'), t('col_use'), ...(ACT ? [t('col_over')] : []), t('col_rec')];
+  downloadCsv('kiro-people.csv', [head, ...vrows().map(r => [r.user, planLabel(r.plan), ...r.per.map(v => Math.round(v * 10) / 10), Math.round(r.total * 10) / 10,
+    Math.round(r.sub * 100) / 100, Math.round(r.use), ...(ACT ? [Math.round(r.over * 10) / 10] : []), r.rec ? `${planLabel(r.rec.to)} (-$${r.rec.saving})` : ''])]);
+}
+function exportEngagement() {
+  const head = [t('col_person'), t('col_seg'), 'first_date', t('col_last'), t('col_ago'), t('col_adays'), t('col_puse'), t('col_msgs'), 'conversations', t('col_cr')];
+  downloadCsv('kiro-engagement.csv', [head, ...engView(engRows()).map(r => [r.user, r.eng.segment, r.eng.first_date, r.eng.last_date,
+    r.eng.days_since_last ?? '', r.eng.active_days, r.eng.use ?? '', r.eng.messages, r.eng.conversations, Math.round(r.total * 10) / 10])]);
 }
 
 /* ---------- costs ---------- */
@@ -468,12 +663,18 @@ function renderCosts() {
 
 /* ---------- findings and footer ---------- */
 function renderFindings() {
-  const steps = [], names = a => a.map(r => r.user).join(', ');
+  const steps = [], names = a => a.map(r => esc(r.user)).join(', ');
   if (!META.estimated_costs && curNet > 0) steps.push(['hoy', 'w_now', t('f_net_t', mlabel(curM)), t('f_net_p', mlabel(curM), usd(curNet))]);
   const over = rows.filter(r => r.refOver > 0);
-  if (over.length) steps.push(['semana', 'w_week', t('f_over_t'), t('f_over_p', over.length, mlabel(refM), over.map(r => `${r.user} (${fmt(r.refOver)})`).join(', '), META.overage_rate)]);
+  if (over.length) steps.push(['semana', 'w_week', t('f_over_t'), t('f_over_p', over.length, mlabel(refM), over.map(r => `${esc(r.user)} (${fmt(r.refOver)})`).join(', '), META.overage_rate)]);
   if (recs.length) steps.push(['semana', 'w_week', t('f_rec_t', usd(saveTotal)),
-    t('f_rec_p', [...recs].sort((a, b) => b.rec.saving - a.rec.saving).map(r => `${r.user}: ${planLabel(r.plan)} → ${planLabel(r.rec.to)} (−$${r.rec.saving})`).join(' · '), mlabel(refM))]);
+    t('f_rec_p', [...recs].sort((a, b) => b.rec.saving - a.rec.saving).map(r => `${esc(r.user)}: ${esc(planLabel(r.plan))} → ${esc(planLabel(r.rec.to))} (−$${r.rec.saving})`).join(' · '), mlabel(refM))]);
+  const pm = META.proj_month, pr = rows.filter(r => r.proj);
+  const willOver = pr.filter(r => r.proj.over_cost > 0).sort((a, b) => b.proj.over_cost - a.proj.over_cost);
+  if (pm && willOver.length) steps.push(['semana', 'w_week', t('f_proj_t', mlabel(pm)),
+    t('f_proj_p', willOver.length, mlabel(pm), willOver.map(r => `${esc(r.user)} (${fmt(r.proj.credits)}/${fmt(r.proj.cap)})`).join(', '), fmt(sum(willOver.map(r => r.proj.over_cost))), META.proj_elapsed)]);
+  const near = pr.filter(r => r.proj.over_cost === 0 && r.proj.use >= 80);
+  if (pm && near.length) steps.push(['semana', 'w_week', t('f_near_t'), t('f_near_p', near.length, mlabel(pm), near.map(r => `${esc(r.user)} (${Math.round(r.proj.use)}%)`).join(', '), META.proj_elapsed)]);
   const zero = rows.filter(r => r.total === 0);
   if (zero.length) steps.push(['mes', 'w_month', t('f_zero_t'), t('f_zero_p', names(zero))]);
   if (!ACT) steps.push(['cont', 'w_cont', t('f_act_t'), t('f_act_p')]);
@@ -493,8 +694,10 @@ function renderStatic() {
 function renderAll() {
   renderStatic(); renderHero(); renderControls(); renderActivity(); renderCurDaily();
   $('act-charts').classList.toggle('hidden', !ACT);
-  renderPeople(); renderCosts(); renderFindings();
+  renderUserFilter(); renderDefs(); renderPeople(); renderEngagement(); renderCosts(); renderFindings();
 }
+$('exp-people').onclick = exportPeople;
+$('exp-eng').onclick = exportEngagement;
 $('lang').onclick = () => { LANG = LANG === 'es' ? 'en' : 'es'; renderAll(); };
 $('theme').onclick = () => {
   const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;

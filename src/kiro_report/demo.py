@@ -51,7 +51,7 @@ def make_demo(
                 msgs = int(credits * rng.uniform(0.8, 1.6))
                 models = tuple((m, max(1, msgs // len(_MODELS))) for m in _MODELS if rng.random() > 0.4)
                 rows.append(ActivityRow(day.isoformat(), name, f"{name}@example.com", client, tier,
-                                        credits, round(overage, 2), msgs, max(1, msgs // 12),
+                                        credits, round(overage, 2), msgs, msgs // 12 if msgs else 0,
                                         offset == 0, models))
 
     uid = {name: str(uuid.uuid5(uuid.NAMESPACE_DNS, name)) for name, _, _ in _USERS}
