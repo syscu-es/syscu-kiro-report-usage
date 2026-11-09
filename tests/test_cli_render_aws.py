@@ -20,7 +20,19 @@ def test_render_fills_every_placeholder_and_escapes_script_close(tmp_path):
         assert token not in html
     assert '<html lang="es">' in html and "data:image/svg+xml;base64," in html and "font/woff2" in html
     assert html.count("</script>") == 1  # only the template's own closing tag; the payload is escaped
-    assert "<\\/script><b>x" in html
+    assert "\\u003c/script\\u003e\\u003cb\\u003ex" in html
+
+
+@pytest.mark.unit
+def test_render_embeds_json_without_html_parser_hazards():
+    data = demo.make_demo(TODAY)
+    data["people"][0]["user"] = "<!--<script>&\u2028\u2029"
+    html = render.render(data, render.default_branding(), "en")
+    payload_start = html.index("const D = ") + len("const D = ")
+    payload = html[payload_start:html.index(";\nconst META", payload_start)]
+    assert "<" not in payload and ">" not in payload and "&" not in payload
+    assert "\u2028" not in payload and "\u2029" not in payload
+    assert json.loads(payload)["people"][0]["user"] == "<!--<script>&\u2028\u2029"  # still lossless
 
 
 @pytest.mark.unit
