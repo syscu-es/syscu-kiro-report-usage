@@ -14,3 +14,14 @@ htmlcov/
 kiro-report-*.html
 kiro-report-*.json
 .cache/
+
+# local agent/tooling state: never commit
+.claude/
+
+# terraform (the lock file is committed; state and real tfvars never are)
+terraform/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log

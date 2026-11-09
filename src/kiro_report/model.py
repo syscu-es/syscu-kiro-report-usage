@@ -1,11 +1,13 @@
 """Merge CUR and activity-report data into the JSON document the HTML template renders."""
 from __future__ import annotations
 
+import calendar
 import collections
 import datetime as dt
 from dataclasses import asdict
 from typing import Any
 
+from . import engagement, forecast
 from .activity import ActivityRow
 from .cur import CurData
 from .ids import normalize_user_id
@@ -115,6 +117,17 @@ def build_report(
         rec = recommend(cell["plan"], cell["credits"]) if cell else None
         person["rec"] = asdict(rec) if rec else None
 
+    index = dict(zip(uids, range(len(uids)), strict=True))
+    eng, period_days = engagement.summarise(activity or [], index, month_set)
+    covered = {r.date[:7] for r in (activity or []) if r.date[:7] in month_set}
+    for position, person in enumerate(people):
+        if position in eng:
+            person["eng"] = eng[position]
+        elif covered & set(person["months"]):
+            person["eng"] = engagement.empty_stats()  # licensed in a month the activity report covers, yet silent
+        else:
+            person["eng"] = None  # no activity data for this user's months: not the same as idle
+
     costs = {}
     for month in with_data:
         if cur:
@@ -124,9 +137,18 @@ def build_report(
             subtotal = sum(p["months"].get(month, {}).get("sub", 0.0) for p in people)
             costs[month] = {"sub": round(subtotal, 2), "offset": 0.0, "estimated": True}
 
-    activity_doc = _activity_document(activity, dict(zip(uids, range(len(uids)), strict=True)), month_set)
+    activity_doc = _activity_document(activity, index, month_set)
     cur_daily = {d: round(v, 1) for d, v in sorted((cur.daily if cur else {}).items())}
     dates = list(cur_daily) + [r[0] for r in (activity_doc["rows"] if activity_doc else [])]
+
+    proj_month = current_month(today) if current_month(today) in with_data else None
+    last_data = max(dates) if dates else ""
+    elapsed = int(last_data[8:10]) if proj_month and last_data[:7] == proj_month else 0
+    in_month = calendar.monthrange(int(today.year), int(today.month))[1]
+    for person in people:
+        cell = person["months"].get(proj_month) if proj_month else None
+        result = forecast.project_month(cell["credits"], elapsed, in_month, cell["plan"]) if cell else None
+        person["proj"] = {"month": proj_month, **result} if result else None
 
     return {
         "meta": {
@@ -141,6 +163,10 @@ def build_report(
             "generated": today.isoformat(),
             "tiers": [asdict(t) for t in TIERS],
             "overage_rate": OVERAGE_RATE,
+            "period_days": period_days,
+            "proj_month": proj_month,
+            "proj_elapsed": elapsed,
+            "thresholds": engagement.thresholds(period_days) if eng else None,
         },
         "people": people,
         "activity": activity_doc,

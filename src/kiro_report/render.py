@@ -11,6 +11,9 @@ PACKAGE_DIR = Path(__file__).parent
 ASSETS_DIR = PACKAGE_DIR / "assets"
 TEMPLATE = PACKAGE_DIR / "templates" / "report.html"
 DEFAULT_BRAND = "SysCu"
+_JSON_ESCAPES = {
+    "<": "\\u003c", ">": "\\u003e", "&": "\\u0026", " ": "\\u2028", " ": "\\u2029",
+}
 _MIME = {".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg"}
 
 
@@ -79,9 +82,13 @@ def render(
     lang: str = "en",
     template: Path = TEMPLATE,
 ) -> str:
-    """Fill the HTML template. ``</`` is escaped so data can never close the script tag."""
+    """Fill the HTML template. The JSON is embedded with ``<``, ``>``, ``&`` and the Unicode line
+    separators escaped, so data can neither close the script tag nor trigger ``<!--<script``
+    parser states. All escapes are valid inside JSON strings, so the payload stays lossless."""
     brand = branding or default_branding()
-    payload = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
+    payload = json.dumps(data, ensure_ascii=False)
+    for char, escaped in _JSON_ESCAPES.items():
+        payload = payload.replace(char, escaped)
     html = template.read_text(encoding="utf-8")
     replacements = {
         "__FONT_CSS__": _font_css(brand.font),
