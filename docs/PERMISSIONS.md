@@ -30,6 +30,8 @@ Run it from the **payer / management account** that receives the Kiro charges, o
 
 ## Enabling the Kiro user activity report
 
+> Prefer infrastructure as code? The optional [`terraform/`](../terraform/README.md) module creates the bucket, the policy below and the read-only IAM policy for you. Only step 3 (the console setting) stays manual.
+
 1. Create an S3 bucket (SSE-S3 or unencrypted; SSE-KMS needs `kms:Decrypt` for the reader).
 2. Allow Kiro to write to it:
 

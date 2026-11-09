@@ -6,6 +6,19 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Engagement section in the report: user segments (power / active / light / idle) based on the share of the plan allowance used (message/conversation thresholds as fallback when the plan is unknown), an engagement funnel, top 10 users by messages, and a last-activity timeline with segment and recency filters.
+- Per-user filter (usage, people and engagement views), metric definitions panel, and client-side CSV export of the people and engagement tables (spreadsheet formulas are neutralised).
+- Optional Terraform module (`terraform/`): encrypted S3 bucket for the Kiro user activity report with the policy Kiro needs, optional CUR 2.0 Data Export, and a least-privilege read-only IAM policy/role for `kiro-report`.
+- End-of-month projection per user (`forecast` module): projected credits and overage at the current pace, with findings for users on course to exceed their plan or to use over 80% of it.
+- Credits by day of week (weekend share) in the usage section.
+- `engagement` module and `people[].eng`, `people[].proj`, `meta.thresholds`, `meta.period_days`, `meta.proj_month` in the `--json` output.
+- Credit to [`aws-samples/sample-kiro-user-analytics-dashboard`](https://github.com/aws-samples/sample-kiro-user-analytics-dashboard), which inspired these additions.
+
+### Changed
+- User, client, plan and account names are HTML-escaped everywhere the report renders them, and the embedded JSON now escapes `<`, `>`, `&` and U+2028/2029 (a crafted name such as `<!--<script>` can no longer break the page).
+- The demo data now includes an idle user (no more phantom conversation on zero-message days).
+
 ### Fixed
 - `kiro-report --version` reported `0.1.0` on 0.1.1: the version is now read from the installed package metadata instead of a second hard-coded copy.
 

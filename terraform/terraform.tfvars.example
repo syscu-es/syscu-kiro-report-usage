@@ -1,0 +1,26 @@
+# Copy to terraform.tfvars (git-ignored) and adjust. All values are placeholders.
+
+region     = "us-east-1"
+account_id = "123456789012" # optional: defaults to the active credentials' account
+
+tags = {
+  Environment = "prod"
+  Owner       = "platform-team"
+}
+
+# --- Kiro activity-report bucket (default: on) ---
+create_activity_bucket = true
+# activity_bucket_name   = "my-company-kiro-activity" # default: kiro-activity-<account>-<region>
+activity_prefix          = "kiro"
+kiro_source_region       = "us-east-1" # region of your Kiro profile / IAM Identity Center
+activity_expiration_days = 400
+
+# --- CUR 2.0 export (default: off; apply from the payer account) ---
+create_cur_export = false
+# cur_bucket_name = "my-company-kiro-cur"
+# cur_prefix      = "cur"
+
+# --- Read-only access for kiro-report ---
+create_reader_policy = true
+create_reader_role   = false
+# reader_principal_arns = ["arn:aws:iam::123456789012:role/my-analyst-role"]

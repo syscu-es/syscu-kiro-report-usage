@@ -16,6 +16,7 @@ It answers the questions Kiro administrators keep asking:
 - What do the subscriptions cost, and how much of it is covered by AWS credits?
 - Who is on the wrong plan? Right-sizing suggestions include overage cost ($0.04/credit).
 - Which licences are idle?
+- Who really uses it? Engagement segments (power / active / light / idle), an engagement funnel, a top-10 by messages and a last-activity timeline, with a per-user filter and CSV export.
 
 The output is a static `.html` file (light/dark theme, English/Spanish, date-range and daily/weekly/monthly filters, tooltips, print-friendly). Share it as an attachment; nothing is uploaded anywhere.
 
@@ -48,6 +49,19 @@ Run `kiro-report` on a terminal and it asks, step by step:
 3. **Period** — last full month, current month, last 3/6/12 months, or a custom `YYYY-MM[:YYYY-MM]` range.
 
 For an existing SSO *profile* with an expired session it offers to run `aws sso login` for you (`--sso-login` does it without asking). Everything is also scriptable: `--sso-start-url … --sso-account <id|name> --sso-role <name>`; `-y/--yes` never prompts. Set `KIRO_REPORT_SSO_START_URL` to pre-fill the start URL.
+
+## Provision the AWS side with Terraform (optional)
+
+[`terraform/`](terraform/README.md) creates what `kiro-report` reads, so you don't have to click through the console: an encrypted S3 bucket for the Kiro user activity report (with the bucket policy Kiro needs), an optional CUR 2.0 Data Export, and a least-privilege read-only IAM policy/role for the tool.
+
+```bash
+cd terraform
+cp terraform.tfvars.example terraform.tfvars   # edit: account id, bucket names, toggles
+terraform init && terraform plan && terraform apply
+terraform output kiro_report_command           # ready-to-run kiro-report command
+```
+
+One step stays manual because Terraform cannot do it: Kiro console → *Settings* → *User activity report* → paste the `activity_report_s3_uri` output. Nothing is created unless you apply; the module has no Glue, Athena or long-lived IAM users, because `kiro-report` reads S3 directly.
 
 ## Where the data comes from
 
@@ -92,7 +106,11 @@ This tool is a lightweight, local alternative to heavier setups; use them if you
 
 - [Kiro User Activity Dashboard](https://docs.aws.amazon.com/guidance/latest/cloud-intelligence-dashboards/kiro-user-activity-dashboard.html) (Cloud Intelligence Dashboards, QuickSight)
 - [`aws-samples/sample-kiro-cost-optimizer`](https://github.com/aws-samples/sample-kiro-cost-optimizer) (serverless, e-mail recommendations)
-- [`aws-samples/sample-kiro-user-analytics-dashboard`](https://github.com/aws-samples/sample-kiro-user-analytics-dashboard)
+- [`aws-samples/sample-kiro-user-analytics-dashboard`](https://github.com/aws-samples/sample-kiro-user-analytics-dashboard) (Streamlit + Athena + Terraform)
+
+### Acknowledgements
+
+The engagement views (user segmentation, funnel, activity timeline, per-user filter, CSV export) and the optional Terraform provisioning are inspired by [`aws-samples/sample-kiro-user-analytics-dashboard`](https://github.com/aws-samples/sample-kiro-user-analytics-dashboard) (MIT-0, © Amazon.com, Inc. or its affiliates). This project is an independent reimplementation (different stack and code): the segment thresholds are adapted from the sample but scale with the report period, and the infrastructure targets this tool's S3-only design instead of Glue/Athena.
 
 ## Privacy
 
